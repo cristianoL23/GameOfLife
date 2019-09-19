@@ -5,4 +5,7 @@ In order to run the program create a file called boardload.txt in the experiment
 The proper file format can be seen in the current boardload.txt.
 The file can be any sized square. The zeroes represent dead cells and the ones are living cells.
 
-In order to see what happens to the cells, run using the command "make experiment"
+In order to see what happens to the cells, run using the command "make experiment".
+
+Report folder contains formal specification document for the project. 
+All discrete mathematics was written using Gries and Schnider notation.
