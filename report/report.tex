@@ -1,0 +1,384 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{hhline}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{url}
+
+\oddsidemargin -10mm
+\evensidemargin -10mm
+\textwidth 160mm
+\textheight 200mm
+\renewcommand\baselinestretch{1.0}
+
+\pagestyle {plain}
+\pagenumbering{arabic}
+
+\newcounter{stepnum}
+
+%% Comments
+
+\usepackage{color}
+
+\newif\ifcomments\commentstrue
+
+\ifcomments
+\newcommand{\authornote}[3]{\textcolor{#1}{[#3 ---#2]}}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\else
+\newcommand{\authornote}[3]{}
+\newcommand{\todo}[1]{}
+\fi
+
+\newcommand{\wss}[1]{\authornote{blue}{SS}{#1}}
+
+\title{Assignment 4, Specification}
+\author{SFWR ENG 2AA4}
+
+\begin {document}
+
+\maketitle
+This Module Interface Specification (MIS) document contains modules, types and
+methods for implementing the model and view of Conway's Game of Life.
+
+\newpage
+
+\section* {Cell Type Module}
+
+\subsection*{Module}
+
+Cell Type
+
+\subsection* {Uses}
+
+N/A
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Constants}
+
+\subsubsection* {Exported Types}
+
+CellT = tuple of (x:$\mathbb{N}$, y:$\mathbb{N}$, status:$\mathbb{B}$)
+
+\subsubsection* {Exported Access Programs}
+
+None
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+None
+
+\subsubsection* {State Invariant}
+
+None
+
+\newpage
+
+
+\section* {Read Module}
+
+\subsection*{Module}
+Read
+
+\subsection* {Uses}
+Cell Types
+Board
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Constants}
+
+None
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+	\hline
+	\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+	\hline
+	ReadFile & $s: \mbox{string}$ & $state: \mbox{seq of(seq of CellT)}$  & runtime\_error\\
+	\hline
+\end{tabular}
+
+
+\subsection* {Semantics}
+
+\subsection*{Environment Variables}
+
+boardLoad: File containing initial board pattern\\
+
+
+\subsubsection* {State Variables}
+
+None
+
+\subsubsection* {State Invariant}
+
+None
+
+\subsection* {Assumptions}
+The input file matches the specification.
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent ReadFile($s$)
+\begin{itemize}
+	\item transition: read data from the file boardLoad associated with the string s.
+	Use this data to update the state of the Board module.  The sequence of sequence of $CellT$ produced by ReadFile will be passed to Board to initialize it.
+	
+	The text file has the following format, where $cstat_mn$, stands for a boolean that represent the status of the cell, essentially whether that cell is dead or alive. With $0$ being dead and $1$ being alive. The values in a row are separated by spaces. The configuration has dimensions $n$ for columns and $m$ for rows, where $n$ and $m$ are $\mathbb{N}$. The data shown below is the format of a file.
+
+	\begin{equation}
+	\begin{array}{ccccccc}
+	cstat_{00} & cstat_{01} & cstat_{02} & cstat_{03} ... & cstat_{0n-1} \\
+	cstat_{10} & cstat_{11} & cstat_{12} & cstat_{13} ... & cstat_{1n} \\
+	cstat_{20} & cstat_{21} & cstat_{22} & cstat_{23} ... & cstat_{2n} \\
+	... & ... & ... & ... & ... & \\
+	cstat_{m-10} & cstat_{m-11} & cstat_{m-12} & cstat_{m-13} ... & cstat_{m-1n-1}\\
+	\end{array}
+	\end{equation}
+	
+	\item exception: runtime\_error
+\end{itemize}
+\newpage
+
+\section* {View Module}
+
+\subsection* {Module}
+
+View
+
+\subsection* {Uses}
+Cell Types\\
+Board
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Types}
+
+None
+
+\subsubsection* {Exported Constants}
+
+None
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | p{3cm} |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+viewScreen & $state: \mbox{seq of(seq of CellT)}$ & Console \textit{see environment variables}& none\\
+\hline
+WriteFile & $state: \mbox{seq of(seq of CellT)}$ & output \textit{see environment variables} & none\\
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsection* {Environment Variables}
+
+Console: output to the screen\\
+output: File that board state is written to\\
+
+\subsubsection* {State Variables}
+
+None
+
+\subsubsection* {State Invariant}
+
+None
+
+\subsubsection* {Assumptions \& Design Decisions}
+
+\begin{itemize}
+\item The View module is called by the Board to show the changes to the board once the rules of the game of life have been applied to the cells.
+\end{itemize}
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent viewScreen($state$)
+\begin{itemize}
+	\item transition: read data from the passed in sequence of sequence of $CellT$ and output it
+	to the screen.
+	
+	The output to the screen has the following format, where $cstat_mn$, stands for a boolean that represent the status of the cell, essentially whether that cell is dead or alive. With $0$ being dead and $1$ being alive. The values in a row are separated by spaces. The configuration has dimensions $n$ for columns and $m$ for rows, where $n$ and $m$ are $\mathbb{N}$. The data shown below is the format of a file.
+	
+	\begin{equation}
+	\begin{array}{ccccccc}
+	cstat_{00} & cstat_{01} & cstat_{02} & cstat_{03} ... & cstat_{0n-1} \\
+	cstat_{10} & cstat_{11} & cstat_{12} & cstat_{13} ... & cstat_{1n} \\
+	cstat_{20} & cstat_{21} & cstat_{22} & cstat_{23} ... & cstat_{2n} \\
+	... & ... & ... & ... & ... & \\
+	cstat_{m-10} & cstat_{m-11} & cstat_{m-12} & cstat_{m-13} ... & cstat_{m-1n-1}\\
+	\end{array}
+	\end{equation}
+	
+	\item exception: none
+\end{itemize}
+
+\noindent WriteFile ($state$)
+\begin{itemize}
+	\item transition: Take the data given from the passed in sequence of sequence of $CellT$ and write the data into a file. The file has this format, here $cstat_mn$, stands for a boolean that represent the status of the cell, essentially whether that cell is dead or alive. With $0$ being dead and $1$ being alive. The values in a row are separated by spaces. The configuration has dimensions $n$ for columns and $m$ for rows, where $n$ and $m$ are $\mathbb{N}$. The data shown below is the format of a file.
+	
+	\begin{equation}
+	\begin{array}{ccccccc}
+	cstat_{00} & cstat_{01} & cstat_{02} & cstat_{03} ... & cstat_{0n-1} \\
+	cstat_{10} & cstat_{11} & cstat_{12} & cstat_{13} ... & cstat_{1n} \\
+	cstat_{20} & cstat_{21} & cstat_{22} & cstat_{23} ... & cstat_{2n} \\
+	... & ... & ... & ... & ... & \\
+	cstat_{m-10} & cstat_{m-11} & cstat_{m-12} & cstat_{m-13} ... & cstat_{m-1n-1}\\
+	\end{array}
+	\end{equation}
+	\item exception: none
+\end{itemize}
+
+\newpage
+
+\section* {Game Board Module}
+
+\subsection*{Module}
+
+Board
+
+\subsection* {Uses}
+
+\noindent CellTypes\\
+
+\subsection* {Syntax}
+
+\subsubsection* {Exported Access Programs}
+
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Routine name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions}\\
+\hline
+new Board & seq of (seq of CellT) & Board & none\\
+\hline
+update & & & none\\
+\hline
+getNewState &  & seq of (seq of CellT) & none\\                                                          
+\hline
+\end{tabular}
+
+\subsection* {Semantics}
+
+\subsubsection* {State Variables}
+
+board\_state: seq of (seq of CellT) \\
+new\_state: seq of (seq of CellT) \\
+
+\subsubsection* {State Invariant}
+
+\subsubsection* {Assumptions \& Design Decisions}
+
+\begin{itemize}
+
+\item The Board constructor is called before any other access
+  routine is called on that instance. Once a Board has been created, the
+  constructor will not be called on it again. The Board is initialized with a
+  sequence of sequence of CellT outputted from the Read module. Therefore the Read
+  module must be called before the Board constructor.
+
+\item Each time the board is modified the new state is the state of the board that is passed to the view module.
+
+\item Once a cell is out of bounds of the board dimensions it is no longer considered when counting the neighbours to follow the rules of the game of life.
+\end{itemize}
+
+\subsubsection* {Access Routine Semantics}
+
+\noindent Board(seq of (seq of CellT)):
+\begin{itemize}
+\item transition:
+board\_state $:=$ seq of (seq of CellT)\\
+new\_state $:=$ seq of (seq of CellT)\\
+\item exception: None
+\end{itemize}
+
+\noindent update():
+\begin{itemize}
+\item transition: board\_state $:=$ new\_state
+
+$(\forall \mathit{r}: \mathbb{N}, \mathit{c}: \mathbb{N} | \mathit{r} < | $ board\_state $| \wedge \mathit{c} < | $ board\_state$|: \text{checkNeighbour}(board\_state[r][c]))$
+
+\begin{tabular}{|l|l|l|}
+	\hhline{~|~|-|}
+	\multicolumn{1}{}{} & \multicolumn{1}{r|}{} & \multicolumn{1}{l|}{new\_state $:=$}\\
+	\hhline{|-|-|-|}
+	$\text{checkNeighbour}(board\_state[r][c]) < 2$ & board\_state[r][c].status = 1 & new\_state[r][c].status = 0 \\
+	\hhline{|-|-|-|}
+	$\text{checkNeighbour}(board\_state[r][c]) > 2$ & board\_state[r][c].status = 1 & new\_state[r][c].status = 0 \\
+	\hhline{|-|-|-|}
+	$\text{checkNeighbour}(board\_state[r][c]) = 2$ & board\_state[r][c].status = 1 & new\_state[r][c].status = 1 \\
+	\hhline{|-|-|-|}
+	$\text{checkNeighbour}(board\_state[r][c]) = 3$ & board\_state[r][c].status = 1 & new\_state[r][c].status = 1 \\
+	\hhline{|-|-|-|}
+	$\text{checkNeighbour}(board\_state[r][c]) = 3$ & board\_state[r][c].status = 0 & new\_state[r][c].status = 1 \\
+	\hhline{|-|-|-|}
+\end{tabular}
+\item output: None
+\item exception: None
+\end{itemize}
+
+\noindent getNewState():
+\begin{itemize}
+\item output: $out := $ new\_state\\
+\item exception: None\\
+\end{itemize}
+
+\newpage
+
+\subsection*{Local Functions}
+
+\noindent $\text{checkNeighbour} : \text{CellT} \rightarrow \mathbb{N}$\\
+\noindent
+$\text{checkNeigbour}$(CellT n) $\equiv$ \\
+\begin{tabular}{|l|l|l|}
+	\hhline{~|~|-|}
+	\multicolumn{1}{}{} & \multicolumn{1}{r|}{} & \multicolumn{1}{l|}{$out:= neigh$}\\
+	\hhline{|-|-|-|}
+	$n.r-1 \geq 0$  & $n.c-1 \geq 0$ & $(+ neigh: \mathbb{N} |$ board\_state$[r-1][c-1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	$n.r-1 \geq 0$  & & $(+ neigh: \mathbb{N} |$ board\_state$[r-1][c].status = 1 : 1)$ \\ 
+	\hhline{|-|-|-|}
+	$n.r-1 \geq 0$  & $n.c+1 \leq $ $|$board\_state$|$ & $(+ neigh: \mathbb{N} |$ board\_state$[r-1][c+1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	 & $n.c-1 \geq 0$  & $(+ neigh: \mathbb{N} |$ board\_state$[r][c-1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	 & $n.c+1 \leq $ $|$board\_state$|$ & $(+ neigh: \mathbb{N} |$ board\_state$[r][c+1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	$n.r+1 \leq 0$ $|$board\_state$|$ & $n.c-1 \geq 0$ & $(+ neigh: \mathbb{N} |$ board\_state$[r+1][c-1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	$n.r+1 \leq 0$ $|$board\_state$|$ & & $(+ neigh: \mathbb{N} |$ board\_state$[r+1][c].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+	$n.r+1 \leq 0$ $|$board\_state$|$ & $n.c+1 \leq $ $|$board\_state$|$ & $(+ neigh: \mathbb{N} |$ board\_state$[r+1][c+1].status = 1 : 1)$ \\
+	\hhline{|-|-|-|}
+\end{tabular}
+\newpage
+
+\section*{Critique of Design}
+For assignment four we as students were asked to create a specification and implementation of Conway's Game of Life using the software engineering principles we learned this term in 2AA4. 
+
+\subsection{Informataion Hiding}
+For my implementation I had three main modules and one type. Each of these modules follows the principle of information hiding and holds a certain "secret". The CellType module's secret is the data structure of cells that make up the board. The Board module's secret is the state of the game board after applying the rules of the game of life. The Read module holds the secret of how the game interacts with the environment variable of text files. The View module's secret is how the user sees the game's state, whether in console or text file. I decided on three modules instead of simply two for this assignment because I felt that adding file reading to the board module would not be a great secret since the module would be interacting with environment variable and changing the state of the board. 
+
+\subsection{Consistency and Cohesion}
+For my modules I tried to have cohesion between the methods included in the module and use consistent conventions. There is cohesion in the modules because they have been decomposed in such a way to allow all the related methods to be grouped together. For example the Board module includes the object constructor, getters and methods to update the board's state. This is an example of cohension since these methods all relate to one another. I kept consistency between modules by using similar naming coventions so that across all modules the specification would make sense. For example each cell has two $\mathbb{N}$ that represent its row and column. So in every loop iterating through cells I use $r$ and $c$ to represent the row and column.
+
+\subsection{Generality}
+For generality, I made my version of game of life allow the user to enter any board size, without restrictions. As well as having a different number of rows and columns so that the board is not completely square. This allows this version of the game of life to be used in a variety of cases that may be restricted by other versions.
+
+\subsection{Essentiality}
+I tried to hold to the principal of essentiality when designing my assignment by ensuring I only specified and coded what was needed by the assignment requirements and for the game to function. Each module is fairly small, consisting of only a few methods, each is distinct and performs a function that another method cannot replicate. For example, I could have easily added more methods to the Board module, such as a size getter, but instead I just used built in functions so that it was not being redundant by coding something that does not need to be.
+
+\subsection{Minimality}
+For the principal of minimality I avoided combining independant services together. For example, printing to the screen and writing to a file have a very similar structure to one another in code. Even after noticing this I kept them as separate methods in the view module because if they were combined it would be offer two different services, console output and file writing. Therefore I made the design decision to keep them separate to avoid violating minimality.
+\end {document}
